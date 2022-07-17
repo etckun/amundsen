@@ -1072,7 +1072,7 @@ class AbstractGremlinProxy(BaseProxy):
                       key=_safe_get(result, 'table', self.key_property_name),
                       is_view=_safe_get(result, 'table', 'is_view'),
                       tags=_safe_get_list(result, 'tags', transform=self._convert_to_tag) or [],
-                      badges=_safe_get_list(result, 'badges', transform=self._get_whitelisted_badges) or [],
+                      badges=_safe_get_list(result, 'badges') or [],
                       description=_safe_get(result, 'description', 'description'),
                       programmatic_descriptions=_safe_get_list(
                           result, 'programmatic_descriptions', transform=self._convert_to_description) or [],
@@ -1174,7 +1174,7 @@ class AbstractGremlinProxy(BaseProxy):
                          col_type=_safe_get(result, 'column', 'col_type'),
                          sort_order=_safe_get(result, 'column', 'sort_order', transform=int),
                          stats=_safe_get_list(result, 'stats', transform=self._convert_to_statistics),
-                         badges=_safe_get_list(result, 'badges', transform=self._get_whitelisted_badges) or [])
+                         badges=_safe_get_list(result, 'badges') or [])
             cols.append(col)
         cols = sorted(cols, key=attrgetter('sort_order'))
         return cols
@@ -1965,7 +1965,7 @@ class AbstractGremlinProxy(BaseProxy):
                     key=_safe_get(result, resource_type.name.lower(), self.key_property_name),
                     level=_safe_get(result, 'level') - 1,
                     source=_safe_get(result, 'source', transform=self._convert_to_source),
-                    badges=_safe_get_list(result, 'badges', transform=self._get_whitelisted_badge) or [],
+                    badges=_safe_get_list(result, 'badges') or [],
                     usage=None,
                     parent=_safe_get(result, 'parent', self.key_property_name)
                 ))
@@ -1976,7 +1976,7 @@ class AbstractGremlinProxy(BaseProxy):
                     key=_safe_get(result, resource_type.name.lower(), self.key_property_name),
                     level=_safe_get(result, 'level') - 1,
                     source=_safe_get(result, 'source', transform=self._convert_to_source),
-                    badges=_safe_get_list(result, 'badges', transform=self._get_whitelisted_badge) or [],
+                    badges=_safe_get_list(result, 'badges') or [],
                     usage=None,
                     parent=_safe_get(result, 'parent', self.key_property_name)
                 ))
