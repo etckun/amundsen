@@ -52,7 +52,6 @@ from gremlin_python.process.traversal import Column as MapColumn
 from gremlin_python.process.traversal import (Direction, Order, P, T, TextP,
                                               Traversal, gte, not_, within,
                                               without)
-from gremlin_python.structure.graph import Path
 from neptune_python_utils.gremlin_utils import ExtendedGraphSONSerializersV3d0
 from overrides import overrides
 from tornado import httpclient
@@ -1127,7 +1126,7 @@ class AbstractGremlinProxy(BaseProxy):
                            hasLabel(VertexTypes.User.value.label).fold()).as_(f'all_{user_label}s')
 
         g = g.select('table', 'schema', 'cluster', 'database',
-                     'watermarks', 'application', 'timestamp', 'tags', 'badges', 
+                     'watermarks', 'application', 'timestamp', 'tags', 'badges',
                      'source', 'stats', 'description', 'programmatic_descriptions',
                      'all_owners', 'num_reads_last_5_days'). \
             by(valueMap()). \
@@ -1159,7 +1158,7 @@ class AbstractGremlinProxy(BaseProxy):
         g = g.coalesce(select('column').outE(EdgeTypes.Stat.value.label).inV().
                        hasLabel(VertexTypes.Stat.value.label).fold()).as_('stats')
         g = g.coalesce(select('column').outE('HAS_BADGE').inV().
-                       hasLabel('Badge').fold()).as_('badges')    
+                       hasLabel('Badge').fold()).as_('badges')
         g = g.select('column', 'description', 'stats', 'badges'). \
             by(valueMap()). \
             by(unfold().valueMap().fold()). \
@@ -1982,9 +1981,9 @@ class AbstractGremlinProxy(BaseProxy):
                     parent=_safe_get(result, 'parent', self.key_property_name)
                 ))
         return Lineage(**{"key": id,
-                        "upstream_entities": upstream_tables,
-                        "downstream_entities": downstream_tables,
-                        "direction": direction, "depth": depth})
+                          "upstream_entities": upstream_tables,
+                          "downstream_entities": downstream_tables,
+                          "direction": direction, "depth": depth})
 
     def _get_linked_tables(self, id: str, resource_name: str, direction: str, depth: int) -> List:
 
@@ -1995,7 +1994,8 @@ class AbstractGremlinProxy(BaseProxy):
             emit().path().map(unfold().hasLabel(resource_name).fold()).as_('path')
         g = g.coalesce(select('path').local(unfold().tail())).as_(resource_type)
         g = g.coalesce(select('path').local(unfold().count())).as_('level')
-        g = g.coalesce(select(resource_type).by(outE(EdgeTypes.Source.value.label).inV().hasLabel(VertexTypes.Source.value.label).fold())).as_('source')
+        g = g.coalesce(select(resource_type).by(outE(EdgeTypes.Source.value.label).inV(). \
+            hasLabel(VertexTypes.Source.value.label).fold())).as_('source')
         g = g.coalesce(select(resource_type).by(inE('BADGE_FOR').outV().hasLabel('Badge').fold())).as_('badges')
         g = g.coalesce(select('path').local(unfold().tail(2).limit(1))).as_('parent')
         g = g.select(resource_name.lower(), 'level', 'source', 'badges', 'parent'). \
