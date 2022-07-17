@@ -1994,11 +1994,8 @@ class AbstractGremlinProxy(BaseProxy):
             emit().path().map(unfold().hasLabel(resource_name).fold()).as_('path')
         g = g.coalesce(select('path').local(unfold().tail())).as_(resource_type)
         g = g.coalesce(select('path').local(unfold().count())).as_('level')
-        g = g.coalesce(
-            select(resource_type).by(
-                outE(EdgeTypes.Source.value.label).inV().hasLabel(VertexTypes.Source.value.label).fold()
-                )
-            ).as_('source')
+        g = g.coalesce(select(resource_type).by(
+            outE(EdgeTypes.Source.value.label).inV().hasLabel(VertexTypes.Source.value.label).fold())).as_('source')
         g = g.coalesce(select(resource_type).by(inE('BADGE_FOR').outV().hasLabel('Badge').fold())).as_('badges')
         g = g.coalesce(select('path').local(unfold().tail(2).limit(1))).as_('parent')
         g = g.select(resource_name.lower(), 'level', 'source', 'badges', 'parent'). \
